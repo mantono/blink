@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class Index implements Serializable
 {
-	private static final File DIR = new File("/home/anton/.blink/bookmarks");
+	private static final File DIR = new File(System.getProperty("user.home") + "/.blink/bookmarks");
 	private Instant indexLastBuilt;
 	
 	public Set<Bookmark> findBookmarks()
