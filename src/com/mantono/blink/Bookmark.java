@@ -1,9 +1,16 @@
-package blink;
+package com.mantono.blink;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Bookmark implements Comparable<Bookmark>, Serializable
 {
@@ -11,20 +18,99 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = -94350200740463415L;
+	private static final String DOMAIN = "\\b[\\w+.]*\\w+\\.\\w{2,}";
 	private final URL url;
+	private final String domain;
 	private final LocalDateTime timestamp;
 	private final Set<String> tags;
-	
-	public Bookmark()
+
+	public Bookmark(final URL url, final LocalDateTime timestamp, Set<String> tags)
 	{
-		// TODO Auto-generated constructor stub
+		this.url = url;
+		if(timestamp.isAfter(LocalDateTime.now()))
+			throw new DateTimeException("Timestamp for bookmark is in the future: " + timestamp);
+		this.timestamp = timestamp;
+		this.tags = tags;
+		this.domain = parseDomain(); 
+	}
+	
+	private String parseDomain()
+	{
+		final Pattern domain = Pattern.compile(DOMAIN);
+		final Matcher matcher = domain.matcher(url.toString());
+		if(!matcher.find())
+			throw new IllegalArgumentException("URL of \"" + url + "\" does not seem to contain a proper domain name.");
+		final int start = matcher.start();
+		final int end = matcher.end();
+		return url.toString().substring(start, end);
+	}
+
+	public URL getUrl()
+	{
+		return url;
+	}
+
+	public LocalDateTime getTimestamp()
+	{
+		return timestamp;
+	}
+
+	public Set<String> getTags()
+	{
+		return tags;
+	}
+
+	public boolean addTag(final String tag)
+	{
+		return tags.add(tag);
+	}
+
+	public boolean removeTag(final String tag)
+	{
+		return tags.remove(tag);
+	}
+
+	public Set<String> getCommonTagsOf(Bookmark bookmark)
+	{
+		Set<String> common = new HashSet<String>(bookmark.getTags());
+		common.retainAll(tags);
+		return common;
+	}
+
+	public String getDomain()
+	{
+		return domain;
+	}
+
+	public CharSequence getHash() throws NoSuchAlgorithmException
+	{
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		final String urlText = url.toString();
+		byte[] hash = digest.digest(urlText.getBytes(StandardCharsets.UTF_8));
+		return new String(hash);
+	}
+
+	@Override
+	public boolean equals(Object object)
+	{
+		if(object == null)
+			return false;
+		if(!(object instanceof Bookmark))
+			return false;
+		final Bookmark other = (Bookmark) object;
+		return url.equals(other.url);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return url.hashCode();
 	}
 
 	@Override
 	public int compareTo(Bookmark other)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return this.timestamp.compareTo(other.timestamp);
 	}
 
 }
