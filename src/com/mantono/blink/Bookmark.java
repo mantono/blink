@@ -22,15 +22,15 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 	private final URL url;
 	private final String domain;
 	private final LocalDateTime timestamp;
-	private final Set<String> tags;
+	private final Set<String> labels;
 
-	public Bookmark(final URL url, final LocalDateTime timestamp, Set<String> tags)
+	public Bookmark(final URL url, final LocalDateTime timestamp, Set<String> labels)
 	{
 		this.url = url;
 		if(timestamp.isAfter(LocalDateTime.now()))
 			throw new DateTimeException("Timestamp for bookmark is in the future: " + timestamp);
 		this.timestamp = timestamp;
-		this.tags = tags;
+		this.labels = labels;
 		this.domain = parseDomain(); 
 	}
 	
@@ -55,25 +55,25 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 		return timestamp;
 	}
 
-	public Set<String> getTags()
+	public Set<String> getLabels()
 	{
-		return tags;
+		return labels;
 	}
 
-	public boolean addTag(final String tag)
+	public boolean addLabel(final String label)
 	{
-		return tags.add(tag);
+		return labels.add(label);
 	}
 
-	public boolean removeTag(final String tag)
+	public boolean removeLabel(final String label)
 	{
-		return tags.remove(tag);
+		return labels.remove(label);
 	}
 
-	public Set<String> getCommonTagsOf(Bookmark bookmark)
+	public Set<String> getCommonLabels(Bookmark bookmark)
 	{
-		Set<String> common = new HashSet<String>(bookmark.getTags());
-		common.retainAll(tags);
+		Set<String> common = new HashSet<String>(bookmark.getLabels());
+		common.retainAll(labels);
 		return common;
 	}
 
