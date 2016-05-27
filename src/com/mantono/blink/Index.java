@@ -77,7 +77,7 @@ public class Index implements Serializable
 		Set<String> labels = new HashSet<String>(lines.size());
 		for(String line : lines)
 			for(String label : line.split(","))
-				labels.add(label);
+				labels.add(label.trim());
 		
 		return labels;
 	}
