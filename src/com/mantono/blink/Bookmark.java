@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.DateTimeException;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -24,14 +25,14 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 	private final long timestamp;
 	private final Set<String> labels;
 
-	public Bookmark(final URL url, final long timestamp, Set<String> labels)
+	public Bookmark(final URL url, final long timestamp, Collection<String> labels)
 	{
 		this.url = url;
 		if(timestamp > Instant.now().getEpochSecond())
 			throw new DateTimeException("Timestamp for bookmark is in the future: " + timestamp);
 		this.timestamp = timestamp;
-		this.labels = labels;
-		this.domain = parseDomain(); 
+		this.labels = new HashSet<String>(labels);
+		this.domain = parseDomain();
 	}
 	
 	private String parseDomain()
