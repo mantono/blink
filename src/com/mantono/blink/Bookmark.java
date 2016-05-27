@@ -19,7 +19,7 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = -94350200740463415L;
-	private static final String DOMAIN = "\\b[\\w+.]*\\w+\\.\\w{2,}";
+	public static final String DOMAIN = "\\b[\\w+.]*\\w+\\.\\w{2,}";
 	private final URL url;
 	private final String domain;
 	private final long timestamp;
