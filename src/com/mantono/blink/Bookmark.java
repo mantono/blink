@@ -43,8 +43,9 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 			throw new IllegalArgumentException("URL of \"" + url + "\" does not seem to contain a proper domain name.");
 		final int start = matcher.start();
 		final int end = matcher.end();
-		final String entireDomain = url.toString().substring(start, end); 
-		return entireDomain.replaceFirst("www.", "");
+		final String dom = url.toString().substring(start, end);
+		final String lowerCaseDomain = dom.toLowerCase();
+		return lowerCaseDomain.replaceFirst("www.", "");
 	}
 
 	public URL getUrl()
