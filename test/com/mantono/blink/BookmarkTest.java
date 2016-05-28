@@ -17,7 +17,15 @@ public class BookmarkTest
 		Bookmark bookmark = new Bookmark(url, 1L, new ArrayList<String>(0));
 		assertEquals("mantono.com", bookmark.getDomain());
 	}
-	
+
+	@Test
+	public void testGetDomainInLowerCase() throws MalformedURLException
+	{
+		final URL url = new URL("http://MANTONO.COM");
+		Bookmark bookmark = new Bookmark(url, 1L, new ArrayList<String>(0));
+		assertEquals("mantono.com", bookmark.getDomain());
+	}
+
 	@Test
 	public void testGetDomainNoLeadingWww() throws MalformedURLException
 	{
