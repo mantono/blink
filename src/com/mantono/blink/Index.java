@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,23 @@ public class Index implements Serializable
 		}
 		indexLastBuilt = Instant.now();
 		return assets;
+	}
+	
+	public static void main(String[] args)
+	{
+		Set<Bookmark> bms = new Index().findBookmarks();
+		for(Bookmark bookmark : bms)
+		{
+			Set<String> labels = bookmark.getLabels();
+			for(String label : args)
+			{
+				if(labels.contains(label))
+				{
+					System.out.println(bookmark.getUrl() + " : " + bookmark.getLabels());
+					break;
+				}
+			}
+		}
 	}
 
 	private void loadFiles(File dir, Set<Bookmark> assets)
