@@ -117,7 +117,7 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 	@Override
 	public int hashCode()
 	{
-		return url.hashCode();
+		return url.toString().hashCode();
 	}
 
 	@Override
