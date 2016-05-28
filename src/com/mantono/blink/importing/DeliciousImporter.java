@@ -26,7 +26,12 @@ public class DeliciousImporter
 
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException
 	{
-		DeliciousImporter di = new DeliciousImporter(new File("/home/anton/.blink/delicious.html"));
+		if(args.length == 0)
+		{
+			System.err.println("Error: Needs an HTML file as argument to import data from.");
+			System.exit(1);
+		}
+		DeliciousImporter di = new DeliciousImporter(new File(args[0]));
 		System.out.println(di.importData());
 	}
 
