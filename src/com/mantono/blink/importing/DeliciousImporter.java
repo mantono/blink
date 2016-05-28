@@ -18,18 +18,18 @@ import com.mantono.blink.Bookmark;
 public class DeliciousImporter
 {
 	private final File data;
-	
+
 	public DeliciousImporter(final File data)
 	{
 		this.data = data;
 	}
-	
+
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException
 	{
 		DeliciousImporter di = new DeliciousImporter(new File("/home/anton/.blink/delicious.html"));
 		System.out.println(di.importData());
 	}
-	
+
 	public int importData() throws IOException, NoSuchAlgorithmException
 	{
 		int imported = 0;
@@ -39,9 +39,6 @@ public class DeliciousImporter
 			if(!line.contains("A HREF="))
 				continue;
 			line = line.replaceAll("(<DT><)|(>[^>]*</A>)", "");
-//			line = line.replaceAll("\"", "");
-//			final String[] fields = line.split("(=)|(\\s)");
-//			assert fields.length >= 8: fields.length + " --> " + line;
 			final Bookmark bookmark = createBookmark(line);
 			if(saveBookmark(bookmark))
 			{
@@ -60,7 +57,6 @@ public class DeliciousImporter
 		final Set<String> labels = parser.getLabels();
 		return new Bookmark(url, timestamp, labels);
 	}
-	//		final List<String> labels = Arrays.asList(labelField.split(","));
 
 	private boolean saveBookmark(Bookmark bookmark) throws NoSuchAlgorithmException, FileNotFoundException, IOException
 	{
