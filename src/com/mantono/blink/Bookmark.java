@@ -34,7 +34,7 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 		this.labels = new HashSet<String>(labels);
 		this.domain = parseDomain();
 	}
-	
+
 	private String parseDomain()
 	{
 		final Pattern domain = Pattern.compile(DOMAIN);

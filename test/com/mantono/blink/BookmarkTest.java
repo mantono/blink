@@ -33,7 +33,7 @@ public class BookmarkTest
 		Bookmark bookmark = new Bookmark(url, 1L, new ArrayList<String>(0));
 		assertEquals("mantono.com", bookmark.getDomain());
 	}
-	
+
 	@Test
 	public void testGetDomainUrlWithSubdomain() throws MalformedURLException
 	{
@@ -41,7 +41,7 @@ public class BookmarkTest
 		Bookmark bookmark = new Bookmark(url, 1L, new ArrayList<String>(0));
 		assertEquals("sub.mantono.com", bookmark.getDomain());
 	}
-	
+
 	@Test
 	public void testGetDomainWithNumber() throws MalformedURLException
 	{
