@@ -110,8 +110,10 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 			return false;
 		if(!(object instanceof Bookmark))
 			return false;
+		
 		final Bookmark other = (Bookmark) object;
-		return url.equals(other.url);
+		
+		return this.url.toString().equals(other.url.toString());
 	}
 
 	@Override
