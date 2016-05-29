@@ -121,9 +121,15 @@ public class Index implements Serializable
 					loadFiles(file, bookmarks);
 				else
 				{
-					Bookmark bookmark = parseBookmarkFile(file);
-					if(bookmark != null)
-						bookmarks.add(bookmark);
+					if(file.lastModified() > indexLastBuilt.toEpochMilli())
+					{
+						Bookmark bookmark = parseBookmarkFile(file);
+						if(bookmark != null)
+						{
+							bookmarks.remove(bookmark);
+							bookmarks.add(bookmark);
+						}
+					}
 				}
 			}
 		}
