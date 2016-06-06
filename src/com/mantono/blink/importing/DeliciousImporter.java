@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.mantono.blink.Bookmark;
+import com.mantono.blink.InputReader;
 
 public class DeliciousImporter
 {
@@ -45,7 +46,7 @@ public class DeliciousImporter
 				continue;
 			line = line.replaceAll("(<DT><)|(>[^>]*</A>)", "");
 			final Bookmark bookmark = createBookmark(line);
-			if(saveBookmark(bookmark))
+			if(InputReader.saveBookmark(bookmark))
 			{
 				System.out.println(line);
 				imported++;
@@ -61,29 +62,5 @@ public class DeliciousImporter
 		final long timestamp = parser.getTimestamp();
 		final Set<String> labels = parser.getLabels();
 		return new Bookmark(url, timestamp, labels);
-	}
-
-	private boolean saveBookmark(Bookmark bookmark) throws NoSuchAlgorithmException, FileNotFoundException, IOException
-	{
-		final CharSequence hash = bookmark.getHash();
-		final String domain = bookmark.getDomain();
-		final File folder = new File(System.getProperty("user.home") + "/.blink/bookmarks/" + domain);
-		if(!folder.exists())
-			Files.createDirectories(folder.toPath());
-		final File file = new File(folder.getAbsolutePath() + "/" + hash);
-		if(file.exists())
-			return false;
-		else
-			file.createNewFile();
-		try(FileOutputStream fileStream = new FileOutputStream(file);
-			PrintStream printStream = new PrintStream(fileStream);)
-		{
-			printStream.print(bookmark.getUrl().toString()+"\n");
-			printStream.print(bookmark.getTimestamp()+"\n");
-			for(String label : bookmark.getLabels())
-				printStream.print(label+"\n");
-			printStream.flush();
-		}
-		return true;
 	}
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -19,24 +20,24 @@ import java.util.Set;
 
 public class Index implements Serializable
 {
-	private static final Path ROOT = Paths.get(System.getProperty("user.home") + "/.blink");
-	private static final File DIR = new File(ROOT + "/bookmarks");
+	public static final Path ROOT = Paths.get(System.getProperty("user.home") + "/.blink");
+	public static final File DIR = new File(ROOT + "/bookmarks");
 	private static final File SAVED_INDEX = new File(ROOT + "/.index");
 	private final Set<Bookmark> bookmarks;
 	private int loadedHashCode = 0;
 	private Instant indexLastBuilt;
-	
-	public Index() throws IOException
+
+	private Index() throws IOException
 	{
 		this.bookmarks = new HashSet<Bookmark>();
 		this.indexLastBuilt = Instant.ofEpochMilli(0);
 	}
-	
+
 	public int size()
 	{
 		return bookmarks.size();
 	}
-	
+
 	public Set<Bookmark> findBookmarks()
 	{
 		if(DIR.exists())
@@ -52,25 +53,32 @@ public class Index implements Serializable
 			System.exit(1);
 		}
 		indexLastBuilt = Instant.now();
-		
+
 		return bookmarks;
 	}
-	
-	public static void main(String[] args) throws IOException, ClassNotFoundException
+
+	public static Index getIndex() throws ClassNotFoundException, IOException
+	{		
+		try
+		{
+			if(SAVED_INDEX.exists())
+				return loadIndex();
+		}
+		catch(InvalidClassException exception)
+		{
+			return new Index();
+		}
+		return new Index();
+	}
+
+	public void search(String[] searchLabels) throws IOException
 	{
-		Index index;
-		
-		if(SAVED_INDEX.exists())
-			index = loadIndex();
-		else
-			index = new Index();
-		
-		Set<Bookmark> bms = index.findBookmarks();
-		
+		Set<Bookmark> bms = findBookmarks();
+
 		for(Bookmark bookmark : bms)
 		{
 			Set<String> labels = bookmark.getLabels();
-			for(String label : args)
+			for(String label : searchLabels)
 			{
 				if(labels.contains(label))
 				{
@@ -79,9 +87,9 @@ public class Index implements Serializable
 				}
 			}
 		}
-		
-		if(index.isUpdatedSinceLoad())
-			saveIndex(index);
+
+		if(isUpdatedSinceLoad())
+			save();
 	}
 
 	private boolean isUpdatedSinceLoad()
@@ -89,11 +97,11 @@ public class Index implements Serializable
 		return bookmarks.hashCode() != loadedHashCode;
 	}
 
-	private static void saveIndex(Index index) throws IOException
+	private void save() throws IOException
 	{
 		FileOutputStream fos = new FileOutputStream(SAVED_INDEX);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(index);
+		oos.writeObject(this);
 	}
 
 	private static Index loadIndex() throws IOException, ClassNotFoundException
@@ -133,7 +141,7 @@ public class Index implements Serializable
 				}
 			}
 		}
-		
+
 		return bookmarks;
 	}
 
@@ -166,7 +174,7 @@ public class Index implements Serializable
 		for(String line : lines)
 			for(String label : line.split(","))
 				labels.add(label.trim());
-		
+
 		return labels;
 	}
 }
