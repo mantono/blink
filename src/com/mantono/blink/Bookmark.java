@@ -34,6 +34,11 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 		this.labels = new HashSet<String>(labels);
 		this.domain = parseDomain();
 	}
+	
+	public Bookmark(final URL url, Collection<String> labels)
+	{
+		this(url, Instant.now().toEpochMilli()/1000, labels);
+	}
 
 	private String parseDomain()
 	{
