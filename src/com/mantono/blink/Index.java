@@ -15,7 +15,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.InputMismatchException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Index implements Serializable
@@ -67,12 +70,12 @@ public class Index implements Serializable
 			if(entry.lastModified() > indexLastBuilt.toEpochMilli())
 				return true;
 		}
-		
+
 		return false;
 	}
 
 	public static Index getIndex() throws ClassNotFoundException, IOException
-	{		
+	{
 		try
 		{
 			if(SAVED_INDEX.exists())
@@ -87,7 +90,25 @@ public class Index implements Serializable
 
 	public void search(String[] searchLabels) throws IOException
 	{
+		List<Bookmark> matches = findMatches(searchLabels);
+		printMatches(matches);
+		Bookmark selected = selectBookmark(matches);
+		
+		if(selected != null)
+		{
+			final String command = "firefox " + selected.getUrl();
+			Runtime.getRuntime().exec(command);
+		}
+
+		if(isUpdatedSinceLoad())
+			save();
+	}
+
+	private List<Bookmark> findMatches(String[] searchLabels)
+	{
+		toLowerCase(searchLabels);
 		Set<Bookmark> bms = findBookmarks();
+		List<Bookmark> matches = new LinkedList<Bookmark>();
 
 		for(Bookmark bookmark : bms)
 		{
@@ -96,14 +117,56 @@ public class Index implements Serializable
 			{
 				if(labels.contains(label))
 				{
-					System.out.println(bookmark.getUrl() + " : " + bookmark.getLabels());
+					matches.add(bookmark);
 					break;
 				}
 			}
 		}
 
-		if(isUpdatedSinceLoad())
-			save();
+		return matches;
+	}
+
+	private void toLowerCase(String[] searchLabels)
+	{
+		for(int i = 0; i < searchLabels.length; i++)
+			searchLabels[i] = searchLabels[i].toLowerCase();
+	}
+
+	private void printMatches(List<Bookmark> matches)
+	{
+		for(int i = 0; i < matches.size(); i++)
+		{
+			final Bookmark bookmark = matches.get(i);
+			System.out.println(i + ": " + bookmark.getUrl() + " : " + bookmark.getLabels());
+		}
+	}
+
+	private Bookmark selectBookmark(List<Bookmark> matches)
+	{
+		@SuppressWarnings("resource")
+		Scanner input = new Scanner(System.in);
+		while(true)
+		{
+			try
+			{
+				System.out.print("Open link: ");
+				final String readInput = input.nextLine();
+				if(readInput.length() == 0)
+					return null;
+
+				final int key = Integer.parseInt(readInput);
+				return matches.get(key);
+			}
+			catch(NumberFormatException | InputMismatchException exception)
+			{
+				System.out.println("A valid number was not entered.");
+			}
+			catch(IndexOutOfBoundsException exception)
+			{
+				final int maxSize = matches.size() - 1;
+				System.out.println("A valid option was not entered. Expected numbers are 0 - " + maxSize);
+			}
+		}
 	}
 
 	private boolean isUpdatedSinceLoad()
