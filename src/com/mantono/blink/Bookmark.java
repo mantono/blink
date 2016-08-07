@@ -31,10 +31,19 @@ public class Bookmark implements Comparable<Bookmark>, Serializable
 		if(timestamp > Instant.now().getEpochSecond())
 			throw new DateTimeException("Timestamp for bookmark is in the future: " + timestamp);
 		this.timestamp = timestamp;
-		this.labels = new HashSet<String>(labels);
+		this.labels = labelsWithLowerCase(labels);
 		this.domain = parseDomain();
 	}
 	
+	private Set<String> labelsWithLowerCase(Collection<String> labels)
+	{
+		Set<String> labelsLower = new HashSet<String>(labels.size());
+		for(String label : labels)
+			labelsLower.add(label.toLowerCase());
+		
+		return labelsLower;
+	}
+
 	public Bookmark(final URL url, Collection<String> labels)
 	{
 		this(url, Instant.now().toEpochMilli()/1000, labels);
