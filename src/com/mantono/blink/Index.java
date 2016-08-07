@@ -42,7 +42,7 @@ public class Index implements Serializable
 	{
 		if(DIR.exists())
 		{
-			if(DIR.lastModified() > indexLastBuilt.toEpochMilli())
+			if(dirHasChanged(DIR))
 				loadFiles(DIR, bookmarks);
 			else
 				return bookmarks;
@@ -55,6 +55,20 @@ public class Index implements Serializable
 		indexLastBuilt = Instant.now();
 
 		return bookmarks;
+	}
+
+	private boolean dirHasChanged(File directory)
+	{
+		for(File entry : directory.listFiles())
+		{
+			if(entry.isDirectory())
+				if(dirHasChanged(entry))
+					return true;
+			if(entry.lastModified() > indexLastBuilt.toEpochMilli())
+				return true;
+		}
+		
+		return false;
 	}
 
 	public static Index getIndex() throws ClassNotFoundException, IOException
